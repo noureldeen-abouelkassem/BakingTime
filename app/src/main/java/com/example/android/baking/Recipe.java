@@ -70,7 +70,6 @@ public class Recipe extends AppCompatActivity implements Player.EventListener {
         }
         setTitle(MainActivity.postResponses.get(recipe_position).getName());
         size_of_recipes = MainActivity.postResponses.get(recipe_position).getSteps().size();
-        intializeRecipe(position);
         btn_next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,13 +104,13 @@ public class Recipe extends AppCompatActivity implements Player.EventListener {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong("videoPosition",player.getCurrentPosition());
+        outState.putLong("videoPosition", player.getCurrentPosition());
         outState.putInt("position", position);
         outState.putInt("recipePosition", recipe_position);
     }
 
     private void intializeRecipe(int position) {
-        if(position>=0&&position<MainActivity.postResponses.get(recipe_position).getSteps().size()){
+        if (position >= 0 && position < MainActivity.postResponses.get(recipe_position).getSteps().size()) {
             if (position == 0) {
                 btn_previous.setVisibility(View.INVISIBLE);
                 btn_next.setVisibility(View.VISIBLE);
@@ -125,7 +124,7 @@ public class Recipe extends AppCompatActivity implements Player.EventListener {
             step = null;
             step = MainActivity.postResponses.get(recipe_position).getSteps().get(position);
             if (!(step.getVideoURL().equals("") && step.getVideoURL().isEmpty())) {
-                if(player != null){
+                if (player != null) {
                     player.release();
                     player = null;
                 }
@@ -160,25 +159,24 @@ public class Recipe extends AppCompatActivity implements Player.EventListener {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (player != null)
+    protected void onStart() {
+        super.onStart();
+        intializeRecipe(position);
+        if (player != null) {
             player.setPlayWhenReady(true);
+        }
+
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         if (player != null) {
             player.setPlayWhenReady(false);
+            player.release();
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        player.release();
-    }
 
     @Override
     public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {

@@ -39,17 +39,19 @@ import butterknife.ButterKnife;
 
 
 public class RecipeFragment extends Fragment implements Player.EventListener {
+    View view;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.recipe_fragment, container, false);
         ButterKnife.bind(this, view);
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             videoPosition = savedInstanceState.getLong("videoPosition");
-        }else {
+        } else {
             videoPosition = 0L;
         }
-        populateUI(view);
+        this.view = view;
         return view;
     }
 
@@ -94,7 +96,7 @@ public class RecipeFragment extends Fragment implements Player.EventListener {
                 MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
                         .createMediaSource(Uri.parse(step.getVideoURL()));
                 player.prepare(videoSource);
-                if(videoPosition == null){
+                if (videoPosition == null) {
                     videoPosition = 0L;
                 }
                 player.seekTo(videoPosition);
@@ -113,25 +115,27 @@ public class RecipeFragment extends Fragment implements Player.EventListener {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
+        populateUI(view);
         if (player != null)
             player.setPlayWhenReady(true);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onStop() {
+        super.onStop();
         if (player != null) {
             player.setPlayWhenReady(false);
             player.release();
         }
     }
 
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putLong("videoPosition",player.getCurrentPosition());
+        outState.putLong("videoPosition", player.getCurrentPosition());
     }
 
     @Override
